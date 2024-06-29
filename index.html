@@ -22,7 +22,16 @@
         var hls = new Hls();
         hls.loadSource('https://d1u68oyra9spme.cloudfront.net/master_4.m3u8');
         hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED,function() {
+
+        hls.on(Hls.Events.MANIFEST_PARSED, function() {
+          var availableLevels = hls.levels;
+          var level720pIndex = availableLevels.findIndex(level => level.height === 720);
+          var highestLevel = availableLevels.length - 1;
+
+          if (availableLevels[highestLevel].height > 720 && level720pIndex !== -1) {
+            hls.currentLevel = level720pIndex;
+          }
+
           video.play();
         });
       }
