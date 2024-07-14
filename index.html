@@ -3,19 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lower Video Quality</title>
+    <title>Embedded iFrame</title>
+    <style>
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            height: 200px; /* Set the height you need */
+            overflow: hidden;
+        }
+        .iframe-container iframe {
+            position: absolute;
+            top: -220px; /* Adjust based on the part you want to show */
+            left: 0;
+            width: 100%;
+            height: 800px; /* Adjust based on the part you want to show */
+            border: 0;
+        }
+    </style>
 </head>
 <body>
-    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width:100%;"><iframe style="position: absolute; top: 0; left: 0; width: 105%; height: 105%;" 
-    <iframe id="videoPlayer" src="https://en.gdplayertv.to/live-tv/fox-sports-1/?embed=1&autoplay=1&mute=1" frameborder="0" allow="autoplay" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const iframe = document.getElementById('videoPlayer');
-            const lowQualityUrl = "https://en.gdplayertv.to/live-tv/fox-sports-1/?embed=1&autoplay=1&mute=1&quality=low"; // Example URL with quality parameter
-
-            iframe.src = lowQualityUrl;
-        });
-    </script>
+    <div class="iframe-container">
+        <iframe src="https://bokulsports.com/livetv/watch/copa-america-live-3/" scrolling="no" allowfullscreen></iframe>
+    </div>
 </body>
 </html>
