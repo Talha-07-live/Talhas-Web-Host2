@@ -43,11 +43,22 @@
     <div id="player"></div>
 
     <script>
-        jwplayer.key = 'EP3tanOyfjurKgiA7KLnzMTekvDl1Wr14XmAOqNBk3eDc3Yyao+866DfCQaHUofh';
+        // Function to validate embedding
+        function isValidEmbed() {
+            const referrer = document.referrer;
+            // Add allowed domains here
+            const allowedDomains = ["https://t.talhasstream-cricket.000.pe/", "https://t.talhasstream-cricket.000.pe/"];
+            return allowedDomains.some(domain => referrer.includes(domain));
+        }
 
-        function setupPlayer(videoUrls, drmOptions = null, posterUrl = null) {
-            const playlistItems = videoUrls.map((url, index) => {
-                return {
+        if (!isValidEmbed()) {
+            document.body.innerHTML = '<h1>Unauthorized Embed</h1><p>Sorry, this content cannot be embedded on unauthorized sites.</p>';
+        } else {
+            jwplayer.key = 'XSuP4qMl+9tK17QNb+4+th2Pm9AWgMO/cYH8CI0HGGr7bdjo';
+
+            function setupPlayer(videoUrls, drmOptions = null, posterUrl = null) {
+                const playlistItems = videoUrls.map((url, index) => {
+                    return {
                     title: "Talha's Stream - Arena Sports 2",
                     description: "You're Watching",
                     image: "https://s11.gifyu.com/images/S1l3T.jpg",
