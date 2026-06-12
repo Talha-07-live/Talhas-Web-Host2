@@ -48,6 +48,14 @@ transparent,
 rgba(0,0,0,.95)
 );
 z-index:50;
+
+opacity:1;
+transition:opacity .3s ease;
+}
+
+.controls.hide{
+opacity:0;
+pointer-events:none;
 }
 
 .progress-track{
@@ -246,12 +254,27 @@ GO LIVE
 const STREAM_URL =
 "https://andro.evrenesoglu57.click/checklist/androstreamlivebsm2.m3u8";
 
-let player;
-let video;
+let player, video, controls, playerShell, hideTimer;
+
+function showControls(){
+controls.classList.remove("hide");
+
+clearTimeout(hideTimer);
+
+if(!video || video.paused) return;
+
+hideTimer = setTimeout(()=>{
+controls.classList.add("hide");
+},3000);
+}
 
 async function init(){
-video=document.getElementById("video");
-player=new shaka.Player(video);
+
+video = document.getElementById("video");
+controls = document.querySelector(".controls");
+playerShell = document.querySelector(".player-shell");
+
+player = new shaka.Player(video);
 
 player.configure({
 streaming:{
@@ -268,53 +291,68 @@ buildQualityMenu();
 }catch(e){
 console.error(e);
 }
+
+/* events */
+playerShell.addEventListener("mousemove",showControls);
+playerShell.addEventListener("touchstart",showControls);
+
+video.addEventListener("play",showControls);
+
+video.addEventListener("pause",()=>{
+controls.classList.remove("hide");
+});
+
 }
 
+/* QUALITY */
 function buildQualityMenu(){
-const menu=document.getElementById("quality");
-const tracks=player.getVariantTracks();
+
+const menu = document.getElementById("quality");
+const tracks = player.getVariantTracks();
 
 tracks.forEach(track=>{
 if(!track.height) return;
-const op=document.createElement("option");
-op.value=track.id;
-op.textContent=track.height+"p";
+
+const op = document.createElement("option");
+op.value = track.id;
+op.textContent = track.height + "p";
 menu.appendChild(op);
 });
 
 menu.addEventListener("change",()=>{
-if(menu.value==="auto"){
+
+if(menu.value === "auto"){
 player.configure({abr:{enabled:true}});
 return;
 }
+
 player.configure({abr:{enabled:false}});
-const selected=tracks.find(t=>t.id==menu.value);
+
+const selected = tracks.find(t=>t.id==menu.value);
 if(selected){
 player.selectVariantTrack(selected,true);
 }
 });
 }
 
+/* CONTROLS */
 document.getElementById("playBtn").onclick=()=>{
 if(video.paused){
 video.play();
+showControls();
 }else{
 video.pause();
+controls.classList.remove("hide");
 }
 };
 
-document.getElementById("rewBtn").onclick=()=>{
-video.currentTime-=10;
-};
-
-document.getElementById("fwdBtn").onclick=()=>{
-video.currentTime+=10;
-};
+document.getElementById("rewBtn").onclick=()=>video.currentTime-=10;
+document.getElementById("fwdBtn").onclick=()=>video.currentTime+=10;
 
 document.getElementById("goLive").onclick=()=>{
 if(!player.isLive()) return;
-const range=player.seekRange();
-video.currentTime=range.end;
+const range = player.seekRange();
+video.currentTime = range.end;
 };
 
 document.getElementById("fullscreenBtn").onclick=()=>{
@@ -326,19 +364,33 @@ document.exitFullscreen();
 }
 };
 
+document.addEventListener("fullscreenchange",()=>{
+controls.classList.remove("hide");
+});
+
+/* PROGRESS */
 setInterval(()=>{
 if(!player || !player.isLive()) return;
-const range=player.seekRange();
-const delay=Math.max(0,Math.floor(range.end-video.currentTime));
-const min=Math.floor(delay/60);
-const sec=delay%60;
-document.getElementById("delay").innerText=
-"-"+String(min).padStart(2,"0")+":"+String(sec).padStart(2,"0");
-const percent=((video.currentTime-range.start)/(range.end-range.start))*100;
-document.getElementById("progress").style.width=percent+"%";
+
+const range = player.seekRange();
+
+const delay = Math.max(0,Math.floor(range.end-video.currentTime));
+const m = Math.floor(delay/60);
+const s = delay%60;
+
+document.getElementById("delay").innerText =
+"-"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+
+const percent =
+((video.currentTime-range.start)/(range.end-range.start))*100;
+
+document.getElementById("progress").style.width = percent+"%";
+
 },1000);
 
+/* INIT */
 shaka.polyfill.installAll();
+
 if(shaka.Player.isBrowserSupported()){
 init();
 }
