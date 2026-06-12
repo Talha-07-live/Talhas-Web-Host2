@@ -37,18 +37,46 @@ object-fit:contain;
 background:#000;
 }
 
+/* CENTER PLAY BUTTON */
+.center-play{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:85px;
+height:85px;
+border-radius:50%;
+background:rgba(0,120,255,0.85);
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+z-index:80;
+transition:0.3s ease;
+box-shadow:0 10px 30px rgba(0,120,255,0.4);
+}
+
+.center-play.hide{
+opacity:0;
+pointer-events:none;
+transform:translate(-50%,-50%) scale(0.6);
+}
+
+.center-play svg{
+width:38px;
+height:38px;
+fill:white;
+}
+
+/* CONTROLS */
 .controls{
 position:absolute;
 left:0;
 right:0;
 bottom:0;
 padding:18px;
-background:linear-gradient(
-transparent,
-rgba(0,0,0,.95)
-);
+background:linear-gradient(transparent,rgba(0,0,0,.95));
 z-index:50;
-
 opacity:1;
 transition:opacity .3s ease;
 }
@@ -70,11 +98,7 @@ cursor:pointer;
 .progress-fill{
 height:100%;
 width:0%;
-background:linear-gradient(
-90deg,
-#7a3cff,
-#d14cff
-);
+background:linear-gradient(90deg,#7a3cff,#d14cff);
 }
 
 .controls-row{
@@ -84,8 +108,7 @@ justify-content:space-between;
 align-items:center;
 }
 
-.controls-left,
-.controls-right{
+.controls-left,.controls-right{
 display:flex;
 align-items:center;
 gap:10px;
@@ -95,24 +118,13 @@ gap:10px;
 width:35px;
 height:35px;
 border:none;
-outline:none;
 cursor:pointer;
 border-radius:50%;
-background:
-linear-gradient(
-180deg,
-rgba(50,50,50,.95),
-rgba(10,10,10,.95)
-);
-
-box-shadow:
-inset 0 1px 1px rgba(255,255,255,.08),
-0 3px 10px rgba(0,0,0,.4);
-
+background:linear-gradient(180deg,rgba(50,50,50,.95),rgba(10,10,10,.95));
+box-shadow:inset 0 1px 1px rgba(255,255,255,.08),0 3px 10px rgba(0,0,0,.4);
 display:flex;
 justify-content:center;
 align-items:center;
-
 color:white;
 }
 
@@ -120,14 +132,6 @@ color:white;
 width:15px;
 height:15px;
 fill:white;
-}
-
-.live-pill{
-padding:8px 5px;
-border-radius:999px;
-background:#151515;
-color:#ff4d4d;
-font-weight:700;
 }
 
 .delay-pill{
@@ -143,23 +147,12 @@ padding:5px 6px;
 border:none;
 cursor:pointer;
 border-radius:999px;
-background:linear-gradient(
-90deg,
-#7a3cff,
-#c14dff
-);
+background:linear-gradient(90deg,#7a3cff,#c14dff);
 color:white;
 font-weight:700;
 }
 
-.quality-menu{
-background:#111;
-color:white;
-border:1px solid #333;
-border-radius:10px;
-padding:8px;
-}
-
+/* LOADER */
 .loader{
 position:absolute;
 inset:0;
@@ -180,17 +173,23 @@ animation:spin 1s linear infinite;
 }
 
 @keyframes spin{
-100%{
-transform:rotate(360deg);
-}
+100%{transform:rotate(360deg);}
 }
 </style>
 </head>
+
 <body>
 
 <div class="player-shell">
 
 <video id="video" autoplay playsinline></video>
+
+<!-- CENTER PLAY -->
+<div class="center-play" id="centerPlay">
+<svg viewBox="0 0 24 24">
+<path d="M8 5v14l11-7z"/>
+</svg>
+</div>
 
 <div class="loader" id="loader">
 <div class="spinner"></div>
@@ -212,40 +211,22 @@ transform:rotate(360deg);
 </svg>
 </button>
 
-<button class="control-btn" id="rewBtn">
-<svg viewBox="0 0 24 24">
-<path d="M11 18V6l-8.5 6zM22 18V6l-8.5 6z"/>
-</svg>
-</button>
+<button class="control-btn" id="rewBtn">⟲</button>
+<button class="control-btn" id="fwdBtn">⟳</button>
 
-<button class="control-btn" id="fwdBtn">
-<svg viewBox="0 0 24 24">
-<path d="M13 6v12l8.5-6zM2 6v12l8.5-6z"/>
-</svg>
-</button>
+<div class="delay-pill" id="delay">-00:00</div>
 
-<div class="delay-pill" id="delay">
--00:00
-</div>
-
-<button class="go-live" id="goLive">
-GO LIVE
-</button>
+<button class="go-live" id="goLive">GO LIVE</button>
 
 </div>
 
 <div class="controls-right">
 
-<button class="control-btn" id="fullscreenBtn">
-<svg viewBox="0 0 24 24">
-<path d="M7 14H5v5h5v-2H7zm0-4h2V7h3V5H5v5zm10 7h-3v2h5v-5h-2zm0-12V5h-5v2h3v3h2z"/>
-</svg>
-</button>
+<button class="control-btn" id="fullscreenBtn">⛶</button>
 
 </div>
 
 </div>
-
 </div>
 
 </div>
@@ -254,7 +235,7 @@ GO LIVE
 const STREAM_URL =
 "https://andro.evrenesoglu57.click/checklist/androstreamlivecbcs.m3u8";
 
-let player, video, controls, playerShell, hideTimer;
+let player, video, controls, playerShell, centerPlay, hideTimer;
 
 function showControls(){
 controls.classList.remove("hide");
@@ -268,11 +249,20 @@ controls.classList.add("hide");
 },3000);
 }
 
+function toggleCenterPlay(){
+if(video.paused || video.readyState < 3){
+centerPlay.classList.remove("hide");
+}else{
+centerPlay.classList.add("hide");
+}
+}
+
 async function init(){
 
 video = document.getElementById("video");
 controls = document.querySelector(".controls");
 playerShell = document.querySelector(".player-shell");
+centerPlay = document.getElementById("centerPlay");
 
 player = new shaka.Player(video);
 
@@ -287,59 +277,32 @@ bufferBehind:120
 try{
 await player.load(STREAM_URL);
 document.getElementById("loader").style.display="none";
-buildQualityMenu();
 }catch(e){
 console.error(e);
 }
 
-/* events */
 playerShell.addEventListener("mousemove",showControls);
 playerShell.addEventListener("touchstart",showControls);
 
-video.addEventListener("play",showControls);
-
-video.addEventListener("pause",()=>{
-controls.classList.remove("hide");
+video.addEventListener("play",()=>{
+showControls();
+toggleCenterPlay();
 });
 
+video.addEventListener("pause",toggleCenterPlay);
+video.addEventListener("waiting",toggleCenterPlay);
+video.addEventListener("playing",toggleCenterPlay);
+
+centerPlay.onclick = ()=>{
+video.play();
+};
+
 }
 
-/* QUALITY */
-function buildQualityMenu(){
-
-const menu = document.getElementById("quality");
-const tracks = player.getVariantTracks();
-
-tracks.forEach(track=>{
-if(!track.height) return;
-
-const op = document.createElement("option");
-op.value = track.id;
-op.textContent = track.height + "p";
-menu.appendChild(op);
-});
-
-menu.addEventListener("change",()=>{
-
-if(menu.value === "auto"){
-player.configure({abr:{enabled:true}});
-return;
-}
-
-player.configure({abr:{enabled:false}});
-
-const selected = tracks.find(t=>t.id==menu.value);
-if(selected){
-player.selectVariantTrack(selected,true);
-}
-});
-}
-
-/* CONTROLS */
+/* BUTTONS */
 document.getElementById("playBtn").onclick=()=>{
 if(video.paused){
 video.play();
-showControls();
 }else{
 video.pause();
 controls.classList.remove("hide");
@@ -364,22 +327,14 @@ document.exitFullscreen();
 }
 };
 
-document.addEventListener("fullscreenchange",()=>{
-controls.classList.remove("hide");
-});
-
-/* PROGRESS */
 setInterval(()=>{
 if(!player || !player.isLive()) return;
 
 const range = player.seekRange();
-
 const delay = Math.max(0,Math.floor(range.end-video.currentTime));
-const m = Math.floor(delay/60);
-const s = delay%60;
 
 document.getElementById("delay").innerText =
-"-"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+"-"+String(Math.floor(delay/60)).padStart(2,"0")+":"+String(delay%60).padStart(2,"0");
 
 const percent =
 ((video.currentTime-range.start)/(range.end-range.start))*100;
@@ -388,7 +343,6 @@ document.getElementById("progress").style.width = percent+"%";
 
 },1000);
 
-/* INIT */
 shaka.polyfill.installAll();
 
 if(shaka.Player.isBrowserSupported()){
