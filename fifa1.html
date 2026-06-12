@@ -9,7 +9,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.15.5/shaka-player.compiled.js"></script>
 
 <style>
-
 *{
 margin:0;
 padding:0;
@@ -177,7 +176,6 @@ animation:spin 1s linear infinite;
 transform:rotate(360deg);
 }
 }
-
 </style>
 </head>
 <body>
@@ -245,7 +243,6 @@ GO LIVE
 </div>
 
 <script>
-
 const STREAM_URL =
 "https://andro.226503.xyz/checklist/androstreamlivebs1.m3u8";
 
@@ -253,170 +250,98 @@ let player;
 let video;
 
 async function init(){
-
 video=document.getElementById("video");
-
 player=new shaka.Player(video);
 
 player.configure({
-
 streaming:{
 bufferingGoal:120,
 rebufferingGoal:5,
 bufferBehind:120
 }
-
 });
 
 try{
-
 await player.load(STREAM_URL);
-
 document.getElementById("loader").style.display="none";
-
 buildQualityMenu();
-
 }catch(e){
-
 console.error(e);
-
 }
-
 }
 
 function buildQualityMenu(){
-
 const menu=document.getElementById("quality");
-
 const tracks=player.getVariantTracks();
 
 tracks.forEach(track=>{
-
 if(!track.height) return;
-
 const op=document.createElement("option");
-
 op.value=track.id;
 op.textContent=track.height+"p";
-
 menu.appendChild(op);
-
 });
 
 menu.addEventListener("change",()=>{
-
 if(menu.value==="auto"){
-
-player.configure({
-abr:{enabled:true}
-});
-
+player.configure({abr:{enabled:true}});
 return;
-
 }
-
-player.configure({
-abr:{enabled:false}
-});
-
-const selected=
-tracks.find(t=>t.id==menu.value);
-
+player.configure({abr:{enabled:false}});
+const selected=tracks.find(t=>t.id==menu.value);
 if(selected){
-
-player.selectVariantTrack(
-selected,
-true
-);
-
+player.selectVariantTrack(selected,true);
 }
-
 });
-
 }
 
 document.getElementById("playBtn").onclick=()=>{
-
 if(video.paused){
-
 video.play();
-
 }else{
-
 video.pause();
-
 }
-
 };
 
 document.getElementById("rewBtn").onclick=()=>{
-
 video.currentTime-=10;
-
 };
 
 document.getElementById("fwdBtn").onclick=()=>{
-
 video.currentTime+=10;
-
 };
 
 document.getElementById("goLive").onclick=()=>{
-
 if(!player.isLive()) return;
-
 const range=player.seekRange();
-
 video.currentTime=range.end;
-
 };
 
 document.getElementById("fullscreenBtn").onclick=()=>{
-
+if(!document.fullscreenElement){
 document.documentElement.requestFullscreen();
-
+screen.orientation.lock("landscape").catch(()=>{});
+}else{
+document.exitFullscreen();
+}
 };
 
 setInterval(()=>{
-
 if(!player || !player.isLive()) return;
-
 const range=player.seekRange();
-
-const delay=Math.max(
-0,
-Math.floor(range.end-video.currentTime)
-);
-
+const delay=Math.max(0,Math.floor(range.end-video.currentTime));
 const min=Math.floor(delay/60);
 const sec=delay%60;
-
 document.getElementById("delay").innerText=
-"-"+
-String(min).padStart(2,"0")+
-":"+
-String(sec).padStart(2,"0");
-
-const percent=
-(
-(video.currentTime-range.start)
-/
-(range.end-range.start)
-)*100;
-
-document.getElementById("progress").style.width=
-percent+"%";
-
+"-"+String(min).padStart(2,"0")+":"+String(sec).padStart(2,"0");
+const percent=((video.currentTime-range.start)/(range.end-range.start))*100;
+document.getElementById("progress").style.width=percent+"%";
 },1000);
 
 shaka.polyfill.installAll();
-
 if(shaka.Player.isBrowserSupported()){
-
 init();
-
 }
-
 </script>
 
 </body>
