@@ -1,96 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Talha's Universal Player</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-    #player {
-      position: absolute;
-      width: 100% !important;
-      height: 100% !important;
-      background-color: #000;
+<html>
+  <head>
+    <title>Shaka Player Green Theme</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/3.0.10/controls.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/3.0.10/shaka-player.ui.min.js" integrity="sha512-QFvv7o/fr201Dyw7VHNBDCn4UCQRuPLLWSLeAk6BGfgK3DTSv0SCFf/4eo9JYVIlAEMFfZDwbtHNUPi1XgpUPg==" crossorigin="anonymous"></script>
+    <script defer src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
 
-    /* Buffer bar design */
-    #bufferBarContainer {
-      position: absolute;
-      bottom: 50px;
-      left: 5%;
-      width: 90%;
-      height: 6px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 3px;
-      overflow: hidden;
-      z-index: 9999;
-    }
-    #bufferBar {
-      height: 100%;
-      width: 0%;
-      background: limegreen;
-      transition: width 0.3s linear;
-    }
-  </style>
-</head>
-<body>
-  <div id="player"></div>
-  <div id="bufferBarContainer"><div id="bufferBar"></div></div>
+    <link rel="stylesheet" href="green-theme.css" />
+    <script src="green-script.js"></script>
 
-  <script>
-    jwplayer.key = "EP3tanOyfjurKgiA7KLnzMTekvDl1Wr14XmAOqNBk3eDc3Yyao+866DfCQaHUofh";
-
-    const player = jwplayer("player").setup({
-      playlist: [{
-        title: "Talha's Stream",
-        description: "FIFA LIVE",
-        image: "https://s11.gifyu.com/images/S1l3T.jpg",
-        sources: [
-          { file: "https://andro.226503.xyz/checklist/androstreamlivebs3.m3u8", type: "hls", label: "HLS 1080p", default: true },
-          { file: "https://example.com/video.mpd", type: "dash", label: "DASH 1080p" }
-        ]
-      }],
-      width: "100%",
-      height: "100%",
-      controls: true,
-      displaytitle: true,
-      displaydescription: true,
-      skin: { name: "netflix" },
-      dvr: true, // DVR mode for live streams
-      bufferlength: 30,
-      hlsjsConfig: {
-        liveSyncDuration: 0,
-        liveMaxLatencyDuration: 120
-      }
-    });
-
-    // Buffer bar update
-    player.on("bufferChange", function(e) {
-      document.getElementById("bufferBar").style.width = e.percent + "%";
-    });
-
-    // Add forward/backward buttons
-    player.on("ready", function() {
-      const container = player.getContainer();
-      const buttonContainer = container.querySelector(".jw-button-container");
-      const rewindBtn = buttonContainer.querySelector(".jw-icon-rewind");
-
-      // Clone rewind for forward
-      const forwardBtn = rewindBtn.cloneNode(true);
-      forwardBtn.style.transform = "scaleX(-1)";
-      forwardBtn.ariaLabel = "Forward 10 Seconds";
-      rewindBtn.parentNode.insertBefore(forwardBtn, rewindBtn.nextElementSibling);
-
-      // Click actions
-      rewindBtn.onclick = () => player.seek(player.getPosition() - 10);
-      forwardBtn.onclick = () => player.seek(player.getPosition() + 10);
-    });
-  </script>
-</body>
+    <style type="text/css">
+      #wrap { width: 500px; margin: 50px auto;  }
+    </style>
+  </head>
+  <body>
+    <section id="wrap">
+            <div lass="green-theme">
+              <video autostart="false" data-shaka-player id="green-theme" style="width:100%;height:100%"></video>
+            </div>
+    </section>
+  </body>
 </html>
