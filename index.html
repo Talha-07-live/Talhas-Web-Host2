@@ -233,9 +233,9 @@ animation:spin 1s linear infinite;
 
 <script>
 const params = new URLSearchParams(window.location.search);
-const STREAM_URL = params.get("Talha");
+const channelId = params.get("Talha");
 
-if (!STREAM_URL) {
+if (!channelId) {
 document.body.innerHTML = `
 <div style="
 height:100vh;
@@ -247,10 +247,13 @@ color:#fff;
 font-family:Arial,sans-serif;
 font-size:20px;
 ">
-No Stream URL Found
+Sorry 404!
 </div>`;
 throw new Error("Missing Talha parameter");
 }
+
+const STREAM_URL =
+`https://andro.evrenesoglu57.click/checklist/${channelId}.m3u8`;
 
 let player, video, controls, playerShell, centerPlay, hideTimer;
 
