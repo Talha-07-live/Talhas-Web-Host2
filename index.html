@@ -365,12 +365,17 @@ document.getElementById("progress").style.width = percent+"%";
 
 shaka.polyfill.installAll();
 
-const ALLOWED_HOSTS = [
-"talhas.stream.site.je/",
-"talhas.streamhg.site.je/"
+const ALLOWED_REFERRERS = [
+"https://talhas.stream.site.je/",
+"https://www.talhas.stream.site.je/"
 ];
 
-if (!ALLOWED_HOSTS.includes(location.hostname)) {
+const referrer = document.referrer;
+
+if (
+referrer &&
+!ALLOWED_REFERRERS.some(url => referrer.startsWith(url))
+){
 document.body.innerHTML = `
 <div style="
 height:100vh;
@@ -384,7 +389,7 @@ font-family:Arial,sans-serif;
 ">
 Access Denied
 </div>`;
-throw new Error("Unauthorized Domain");
+throw new Error("Unauthorized Referrer");
 }
 
 if(shaka.Player.isBrowserSupported()){
